@@ -8,15 +8,13 @@ def reviews_by_year(data):
         data_legivel = utils.convert_date(timestamp) # Devolve "YYYY-MM-DD"
         
         if data_legivel:
-            # TAREFA: Extrair apenas o ano (os primeiros 4 caracteres)
-            ano = data_legivel[:4]
-            # TAREFA: Contar quantas reviews há nesse ano
             ano = data_legivel[:4]
             if ano not in reviews_por_ano:
                 reviews_por_ano[ano] = 0
             reviews_por_ano[ano] += 1
 
     return reviews_por_ano
+
 
 def analyze_word_frequency(data):
     """PARTE CRIATIVA: Palavras mais comuns em 5 estrelas vs 1 estrela"""
