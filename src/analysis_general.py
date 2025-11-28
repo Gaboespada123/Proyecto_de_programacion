@@ -30,6 +30,18 @@ def analyze_word_frequency(data):
         score = row['Score']
         text = row['Text'].lower()
         # TAREFA: Limpar pontuação, fazer split()
+        words = text.split()
+        for word in words:
+            if word not in stop_words:
+                continue
+            if score == 5:
+                if word not in words_5_star:
+                    words_5_star[word] = 0
+                words_5_star[word] += 1
+            elif score == 1:
+                if word not in words_1_star:
+                    words_1_star[word] = 0
+                words_1_star[word] += 1
         # Se score == 5, conta as palavras no dic words_5_star
         # Se score == 1, conta as palavras no dic words_1_star
     
