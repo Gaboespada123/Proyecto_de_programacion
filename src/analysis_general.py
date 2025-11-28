@@ -15,6 +15,46 @@ def reviews_by_year(data):
 
     return reviews_por_ano
 
+def reviews_by_month(data):
+    """Devolve um dicionário {Mês: Quantidade}"""
+    reviews_por_mes = {}
+    for row in data:
+        timestamp = row['Time']
+        data_legivel = utils.convert_date(timestamp) # Devolve "YYYY-MM-DD"
+        
+        if data_legivel:
+            mes = data_legivel[5:7]
+            if mes not in reviews_por_mes:
+                reviews_por_mes[mes] = 0
+            reviews_por_mes[mes] += 1
+
+    return reviews_por_mes
+
+#Identificar o ano com maior número de avaliações
+def year_with_most_reviews(data):
+    """Devolve o ano com mais reviews e a quantidade"""
+    ano_mais_reviews = None
+    max_reviews = 0
+
+    for ano, quantidade in reviews_by_year(data).items():
+        if quantidade > max_reviews:
+            max_reviews = quantidade
+            ano_mais_reviews = ano
+
+    return ano_mais_reviews, max_reviews
+
+#Identificar o mês com maior número de avaliações
+def month_with_most_reviews(data):
+    """Devolve o mes com mais reviews e a quantidade"""
+    mes_mais_reviews = None
+    max_reviews_mes = 0
+
+    for mes, quantidade in reviews_by_month(data).items():
+        if quantidade > max_reviews_mes:
+            max_reviews_mes = quantidade
+            mes_mais_reviews = mes
+
+    return mes_mais_reviews, max_reviews_mes
 
 def analyze_word_frequency(data):
     """PARTE CRIATIVA: Palavras mais comuns em 5 estrelas vs 1 estrela"""
