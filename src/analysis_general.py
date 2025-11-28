@@ -23,13 +23,15 @@ def analyze_word_frequency(data):
     words_5_star = {}
     words_1_star = {}
     
-    # Palavras para ignorar (podes adicionar mais)
-    stop_words = ['the', 'and', 'a', 'to', 'of', 'is', 'it', 'in', 'i', 'this', 'that', 'was', 'for', 'on', 'with', 'as', 'but', 'are', 'they', 'be', 'at', 'or']
-    
+    # Palavras a ignorar (artigos (in)defenidos, conjunções, pronomes e preposições comuns)
+
+    stop_words = ['the', 'and', 'a', 'to', 'of', 'is', 'it', 'in',
+                  'i', 'this', 'that', 'was', 'for', 'on', 'with',
+                  'as', 'but', 'are', 'they', 'be', 'at', 'or']
+
     for row in data:
         score = row['Score']
         text = row['Text'].lower()
-        # TAREFA: Limpar pontuação, fazer split()
         words = text.split()
         for word in words:
             if word not in stop_words:
@@ -42,7 +44,4 @@ def analyze_word_frequency(data):
                 if word not in words_1_star:
                     words_1_star[word] = 0
                 words_1_star[word] += 1
-        # Se score == 5, conta as palavras no dic words_5_star
-        # Se score == 1, conta as palavras no dic words_1_star
-    
     return words_5_star, words_1_star
