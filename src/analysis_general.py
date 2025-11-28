@@ -45,3 +45,31 @@ def analyze_word_frequency(data):
                     words_1_star[word] = 0
                 words_1_star[word] += 1
     return words_5_star, words_1_star
+
+
+"""stop words alternativa:
+stop_words ={
+    # Articles
+    "the", "a", "an",
+
+    # Conjunções
+    "and", "but", "or", "nor", "for", "yet", "so",
+    "although", "though", "because", "since",
+    "if", "unless", "whereas", "while", "as", "before",
+    "after", "until", "once", "whether", "that", "than",
+    "both", "either", "neither", "whether", "as",
+
+    # Pronomes
+    "i", "you", "he", "she", "it", "we", "they",
+    "me", "him", "her", "us", "them","my", "your", "his", "her", "its", "our", "their",
+    "mine", "yours", "hers", "ours", "theirs", "myself", "yourself", "himself", 
+    "herself", "itself","ourselves", "yourselves", "themselves", "this", "that", 
+    "these", "those", "who", "whom","whose", "which", "that", "any", "anyone",
+    "anybody", "anything", "some", "someone", "somebody", "something", "each", "either",
+    "neither", "few", "many", "several", "all", "most",
+    "none", "one", "everyone", "everybody", "everything",
+    "no one", "nobody", "nothing",
+
+    # Interrogativa
+    "what", "which"
+} """
