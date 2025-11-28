@@ -23,8 +23,7 @@ def analyze_word_frequency(data):
     words_5_star = {}
     words_1_star = {}
     
-    # Palavras a ignorar (artigos (in)defenidos, conjunções, pronomes e preposições comuns)
-
+    # Palavras a ignorar
     stop_words = ['the', 'and', 'a', 'to', 'of', 'is', 'it', 'in',
                   'i', 'this', 'that', 'was', 'for', 'on', 'with',
                   'as', 'but', 'are', 'they', 'be', 'at', 'or']
