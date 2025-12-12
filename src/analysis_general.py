@@ -1,112 +1,110 @@
-import utils # Para usar o convert_date
+
+import datetime
+from src import utils 
 
 def reviews_by_year(data):
     """Devolve um dicionário {Ano: Quantidade}"""
     reviews_por_ano = {}
     for row in data:
-        timestamp = row['Time']
-        data_legivel = utils.convert_date(timestamp) # Devolve "YYYY-MM-DD"
-        
-        if data_legivel:
-            ano = data_legivel[:4]
-            if ano not in reviews_por_ano:
-                reviews_por_ano[ano] = 0
-            reviews_por_ano[ano] += 1
-
+        try:
+            timestamp = row['Time']
+            try:
+                data_legivel = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d')
+            except (ValueError, TypeError):
+                continue
+            
+            if data_legivel:
+                ano = data_legivel[:4]
+                if ano not in reviews_por_ano:
+                    reviews_por_ano[ano] = 0
+                reviews_por_ano[ano] += 1
+        except KeyError:
+            continue
     return reviews_por_ano
 
 def reviews_by_month(data):
     """Devolve um dicionário {Mês: Quantidade}"""
     reviews_por_mes = {}
     for row in data:
-        timestamp = row['Time']
-        data_legivel = utils.convert_date(timestamp) # Devolve "YYYY-MM-DD"
-        
-        if data_legivel:
-            mes = data_legivel[5:7]
-            if mes not in reviews_por_mes:
-                reviews_por_mes[mes] = 0
-            reviews_por_mes[mes] += 1
-
+        try:
+            timestamp = row['Time']
+            try:
+                data_legivel = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d')
+            except (ValueError, TypeError):
+                continue
+            
+            if data_legivel:
+                mes = data_legivel[5:7]
+                if mes not in reviews_por_mes:
+                    reviews_por_mes[mes] = 0
+                reviews_por_mes[mes] += 1
+        except KeyError:
+            continue
     return reviews_por_mes
 
-#Identificar o ano com maior número de avaliações
-def year_with_most_reviews(data):
-    """Devolve o ano com mais reviews e a quantidade"""
-    ano_mais_reviews = None
-    max_reviews = 0
+# Funções de Estatística Geral 
 
-    for ano, quantidade in reviews_by_year(data).items():
-        if quantidade > max_reviews:
-            max_reviews = quantidade
-            ano_mais_reviews = ano
+def get_general_statistics(data):
+    """
+    Calcula estatísticas gerais do dataset:
+    - Total de reviews, produtos únicos, utilizadores únicos, média geral.
+    """
+    stats = {
+        'total_reviews': len(data),
+        'unique_users': set(),
+        'unique_products': set(),
+        'total_score': 0,
+        'average_score': 0.0
+    }
 
-    return ano_mais_reviews, max_reviews
+    count_scores = 0
 
-#Identificar o mês com maior número de avaliações
-def month_with_most_reviews(data):
-    """Devolve o mes com mais reviews e a quantidade"""
-    mes_mais_reviews = None
-    max_reviews_mes = 0
+    for registro in data:
+        try:
+            if 'ProfileName' in registro:
+                stats['unique_users'].add(registro['ProfileName'])
+            
+            if 'ProductId' in registro:
+                stats['unique_products'].add(registro['ProductId'])
+            
+            score = int(registro['Score'])
+            stats['total_score'] += score
+            count_scores += 1
+            
+        except (ValueError, KeyError, TypeError):
+            continue
 
-    for mes, quantidade in reviews_by_month(data).items():
-        if quantidade > max_reviews_mes:
-            max_reviews_mes = quantidade
-            mes_mais_reviews = mes
-
-    return mes_mais_reviews, max_reviews_mes
-
-def analyze_word_frequency(data):
-    """PARTE CRIATIVA: Palavras mais comuns em 5 estrelas vs 1 estrela"""
-    words_5_star = {}
-    words_1_star = {}
+    stats['unique_users'] = len(stats['unique_users'])
+    stats['unique_products'] = len(stats['unique_products'])
     
-    # Palavras a ignorar
-    stop_words = ['the', 'and', 'a', 'to', 'of', 'is', 'it', 'in',
-                  'i', 'this', 'that', 'was', 'for', 'on', 'with',
-                  'as', 'but', 'are', 'they', 'be', 'at', 'or']
+    # Aplicamos try-except ZeroDivisionError aquí también por si acaso
+    try:
+        stats['average_score'] = stats['total_score'] / count_scores
+    except ZeroDivisionError:
+        stats['average_score'] = 0.0
 
-    for row in data:
-        score = row['Score']
-        text = row['Text'].lower()
-        words = text.split()
-        for word in words:
-            if word not in stop_words:
-                continue
-            if score == 5:
-                if word not in words_5_star:
-                    words_5_star[word] = 0
-                words_5_star[word] += 1
-            elif score == 1:
-                if word not in words_1_star:
-                    words_1_star[word] = 0
-                words_1_star[word] += 1
-    return words_5_star, words_1_star
+    return stats
 
+def get_weighted_average_score(data):
+    """
+    Calcula a avaliação média ponderada pela utilidade (Helpfulness).
+    Fórmula: Soma(Score * HelpfulnessNumerator) / Soma(HelpfulnessNumerator)
+    """
+    soma_ponderada = 0
+    total_util = 0
 
-"""stop words alternativa:
-stop_words ={
-    # Articles
-    "the", "a", "an",
+    for registro in data:
+        try:
+            pontuacao = int(registro['Score'])
+            util = int(registro['HelpfulnessNumerator'])
 
-    # Conjunções
-    "and", "but", "or", "nor", "for", "yet", "so",
-    "although", "though", "because", "since",
-    "if", "unless", "whereas", "while", "as", "before",
-    "after", "until", "once", "whether", "that", "than",
-    "both", "either", "neither", "whether", "as",
+            soma_ponderada += pontuacao * util
+            total_util += util
+        except (ValueError, KeyError, TypeError):
+            continue
 
-    # Pronomes
-    "i", "you", "he", "she", "it", "we", "they",
-    "me", "him", "her", "us", "them","my", "your", "his", "her", "its", "our", "their",
-    "mine", "yours", "hers", "ours", "theirs", "myself", "yourself", "himself", 
-    "herself", "itself","ourselves", "yourselves", "themselves", "this", "that", 
-    "these", "those", "who", "whom","whose", "which", "that", "any", "anyone",
-    "anybody", "anything", "some", "someone", "somebody", "something", "each", "either",
-    "neither", "few", "many", "several", "all", "most",
-    "none", "one", "everyone", "everybody", "everything",
-    "no one", "nobody", "nothing",
-
-    # Interrogativa
-    "what", "which"
-} """
+    
+    try:
+        return soma_ponderada / total_util
+    except ZeroDivisionError:
+        return 0.0
